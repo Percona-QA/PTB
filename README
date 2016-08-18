@@ -1,0 +1,129 @@
+Percona Test Bench (c) 2013 Percona Ireland Ltd
+===============================================================================
+Originally Created 04/2013 George Ormond Lorch III
+Written by George Ormond Lorch III
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+
+Launchpad homepage:
+* https://launchpad.net/percona-test-bench
+
+Bazaar code repository:
+* lp:percona-test-bench
+
+
+LICENSE
+===============================================================================
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2 of the License. Please see the
+LICENSE file for information about licensing and use restrictions of
+this software.
+
+
+INTRODUCTION
+===============================================================================
+The Percona Test Bench is written entirely in bash script with the ability to
+call or use any external tools or software.
+
+The purpose of The Percona Test Bench is to facilitate the creation of generic
+test patterns which then call out to or include other scripts that implement
+the details of each test.
+
+
+CORE
+===============================================================================
+The core infrastructure is implemented in the file ./include/ptb_core.inc.
+This file contains several low level mechanisms as well as some higher level
+functionality to make creating test pattern and detail scripts quick and easy.
+
+Current functionality exposed by this file:
+- Reporting with verbosity filtering and debugging features.
+- Advanced options and defaults-file parsing and varible management functions.
+- Server instance, options matrix, data and parallel task management functions.
+- SQL query calling and master-slave management functions.
+- Database prepare/caching mechanism.
+- Database integrity/validation functions.
+- Several other helper functions.
+
+TESTS
+===============================================================================
+Tests will generally consist of a central test pattern script which uses a
+configuration file to specify details of the test and identify which detail
+scripts should be used.
+
+Lets examine the ptb_xtrabackup_test.sh with changed_page_bitmap_sysbench.cfg.
+
+This .cfg file specifies that this test is to make use of:
+./include/sysbench_oltp_prepare.sh
+./include/sysbench_oltp_load.sh
+./include/xtrabackup_incremental_backup.sh
+./include/xtrabackup_restore_and_validate.sh
+./include/xtrabackup_cleanup.sh
+
+The .cfg file specifies details of which server options and xtrabackup options
+and arrays of values should be used. This particular script multiplies out the
+full matrix of all possible values specified and runs one full test cycle per
+option combination.
+
+This .cfg file also allows for the specification and pass through of options
+for the load preparation and load execution so that the size and shape of the
+dataset as well as the weight of the load can be easily controlled.
+
+Placing options in the .cfg file is synonymous with passing them on the command
+line. Some options may be specified only once while others may have multiple 
+instances and will 'stack' internally. Multiple .cfg files may be specified
+but after all command line files and .cfg files are processed, the scripts
+rules on options will still be enforced. In other words, if an option may
+only be specified once, that means it may only appear once in all .cfg files
+and on the command line together.
+
+Generally, use .cfg files to specify test details that are independent of the
+actual environment and create a wrapper script such as 
+changed_page_bitmap_sysbench.sh which can then specify some of the more
+specific environmental values such as the locations of mysql, xtrabackup and
+test tool binaries.
+
+
+DETAIL SCRIPTS
+===============================================================================
+The 'detail' scripts are used to execute a specific function of the test and
+must conform to a common parameterized option interface in order to 'play nice'
+with other detail scripts and the test pattern script. Over time these
+'contracts' will obviously change but there comes a point when a new detail
+script should be created rather than attempting to bend or extend and existing
+script beyond it original intentions.
+
+Currently there are five different flavors of detail scripts:
+- database/load prepare
+- load execution
+- backup
+- restore/verify
+- cleanup
+
+Each of these is intended to perform a fairly narrow and specific function
+and some are meant to be used together from the test pattern script. For
+example, if you are going to use sysbench_oltp_load.sh, you will need to
+also use sysbench_oltp_prepare.sh in order to precreate the correct schema
+and optionally pre-load the server with some data.
+
+INTERACTIVE
+===============================================================================
+There is an 'interactive' script that allows manual calling/execution of all of
+the core functions and can also be used to help debug a test failure by
+remounting a test sandbox and starting the server(s) to easily inspect their
+current state. It can also be used as a simple way to fire up several servers
+in complex replication scenarios for manual testing or bug verification
+and validation.
