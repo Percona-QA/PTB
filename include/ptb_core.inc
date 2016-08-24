@@ -573,7 +573,11 @@ function ptb_create_server_data()
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
-		ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysql_install_db --defaults-file=${S_DEFAULTSFILE[$instanceid]} --basedir=${S_BINDIR[$instanceid]}
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysqld --initialize --defaults-file=${S_DEFAULTSFILE[$instanceid]} --basedir=${S_BINDIR[$instanceid]}
+		else
+			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysql_install_db --defaults-file=${S_DEFAULTSFILE[$instanceid]} --basedir=${S_BINDIR[$instanceid]}
+		fi
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			ptb_report_error "ptb_create_server_data($1) - mysql_install_db failed with $rc, logfile:"
