@@ -53,7 +53,7 @@ function xtrabackup_common_add_mark_data()
 	if [ $rc -ne 0 ]; then
 		ptb_report_error "$prefix - ptb_sql($server_id, \"${sql}\") failed with $rc"
 		ptb_report_idebug_leave "$prefix = $rc"
-		retrurn $rc
+		return $rc
 	fi
 	
 	sql="CREATE TABLE IF NOT EXISTS PERCONA_SCHEMA.backup_test_mark ( c1 VARCHAR(255) NOT NULL ) ENGINE=INNODB"
