@@ -57,7 +57,7 @@ function backup()
 		ptb_init_statistics_manager $PTB_OPT_statistics_manager
 	fi
 
-	# build out the proper path to use for callng innobackupex
+	# build out the proper path to use for callng xtrabackup
 	local xtrabackup_path="${S_BINDIR[$PTB_OPT_server_id]}/bin:${S_BINDIR[$PTB_OPT_server_id]}/libexec:$PTB_OPT_backup_rootdir"
 	# build out the sleep schedule
 	local sleep_schedule[0]=$BACKUP_OPT_cycle_delay
@@ -108,7 +108,7 @@ function backup()
 		fi
 	fi
 
-	#parse the options and build out the correct innobackupex command line
+	#parse the options and build out the correct xtrabackup command line
 	xtrabackup_common_parse_command_options
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -157,7 +157,7 @@ function backup()
 			local inc_backup_command=""
 			if [ $current_cycle -ne 0 ]; then
 				ptb_report_info "Backup - estimated to_lsn $to_lsn"
-				inc_backup_command="--incremental --incremental-lsn=$to_lsn"
+				inc_backup_command="--incremental-lsn=$to_lsn"
 			fi
 
 			#ptb_sql $serverid "SHOW STATUS LIKE 'innodb_buffer_pool%'"
@@ -166,7 +166,7 @@ function backup()
 			ptb_report_info "$rpt_prefix - starting: full backup cycle=${full_cycle} incremental backup cycle=${current_cycle}"
 			ptb_report_info "$rpt_prefix - options: ${PTB_OPT_backup_command_option[@]}"
 			ptb_report_info "$rpt_prefix - path: ${xtrabackup_path}"
-			ptb_report_info "$rpt_prefix - command: innobackupex $backup_command $inc_backup_command"
+			ptb_report_info "$rpt_prefix - command: xtrabackup $backup_command $inc_backup_command"
 
 			if [ $BACKUP_OPT_drop_caches -ne 0 ]; then
 				ptb_report_info "$rpt_prefix - flushng caches..."
@@ -177,11 +177,11 @@ function backup()
 			local backup_start_time=$SECONDS
 
 			if [ $BACKUP_OPT_dev_null -ne 0 ]; then
-				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; innobackupex $backup_command $inc_backup_command --stream=xbstream $backup_current_dir 1>/dev/null )"
-				( PATH=${xtrabackup_path}:$PATH; innobackupex $backup_command $inc_backup_command --stream=xbstream $backup_current_dir 1>/dev/null 2> $cycle_logfile )
+				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null )"
+				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null 2> $cycle_logfile )
 			else
-				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; innobackupex $backup_command $inc_backup_command $backup_current_dir )"
-				( PATH=${xtrabackup_path}:$PATH; innobackupex $backup_command $inc_backup_command $backup_current_dir 2> $cycle_logfile )
+				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir  --backup )"
+				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --backup 2> $cycle_logfile )
 			fi
 			rc=$?
 			local backup_total_time=`expr $SECONDS - $backup_start_time`
@@ -197,7 +197,7 @@ function backup()
 			fi
 
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - innobackupex($backup_command $inc_backup_command $backup_current_dir) failed with $rc"
+				ptb_report_error "$rpt_prefix - xtrabackup($backup_command $inc_backup_command --target-dir=$backup_current_dir --backup) failed with $rc"
 				break
 			fi
 

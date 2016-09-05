@@ -55,10 +55,10 @@ function restore()
 		ptb_init_statistics_manager $PTB_OPT_statistics_manager
 	fi
 
-	# build out the proper path to use for callng innobackupex
+	# build out the proper path to use for callng xtrabackup
 	local xtrabackup_path="${S_BINDIR[$PTB_OPT_server_id]}/bin:${S_BINDIR[$PTB_OPT_server_id]}/libexec:$PTB_OPT_restore_rootdir"
 
-	#parse the options and build out the correct innobackupex command line
+	#parse the options and build out the correct xtrabackup command line
 	xtrabackup_common_parse_command_options
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -94,7 +94,7 @@ function restore()
 			ptb_report_info "$rpt_prefix - starting: full backup cycle=${full_cycle} incremental backup cycle=${current_cycle} "
 			ptb_report_info "$rpt_prefix - options: ${PTB_OPT_backup_command_option[@]}"
 			ptb_report_info "$rpt_prefix - path: ${xtrabackup_path}"
-			ptb_report_info "$rpt_prefix - base command: innobackupex $restore_base_command"
+			ptb_report_info "$rpt_prefix - base command: xtrabackup $restore_base_command --prepare"
 			
 			# first, copy the source backup into another working dir so that
 			# the original remains unmolested by the restore process
@@ -124,7 +124,7 @@ function restore()
 			fi 
 
 			# do the first prepare
-			local restore_command="$restore_base_command --apply-log --redo-only"
+			local restore_command="$restore_base_command --prepare --apply-log-only"
 
 			# if we are preparing the base...
 			if [ $current_cycle -eq 0 ]; then
@@ -145,11 +145,11 @@ function restore()
 			fi
 
 			local restore_start_time=$SECONDS
-			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir1 )"
-			( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir1 &> $cycle_logfile ) 
+			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command $restore_working_dir1 )"
+			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir1 &> $cycle_logfile ) 
 			rc=$?
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - innobackupex($restore_command) failed with $rc, see ${cycle_logfile}"
+				ptb_report_error "$rpt_prefix - xtrabackup($restore_command) failed with $rc, see ${cycle_logfile}"
 				break
 			fi
 			ptb_report_file_info $cycle_logfile
@@ -162,12 +162,12 @@ function restore()
 			fi
 
 			# do the final apply log
-			restore_command="$restore_base_command --apply-log"
-			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir2 )"
-			( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir2 &> $cycle_logfile ) 
+			restore_command="$restore_base_command --prepare"
+			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command $restore_working_dir2 )"
+			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - innobackupex($restore_command) failed with $rc"
+				ptb_report_error "$rpt_prefix - xtrabackup($restore_command) failed with $rc"
 				break
 			fi
 			ptb_report_file_info $cycle_logfile
@@ -186,11 +186,11 @@ function restore()
 
 			# copy back
 			restore_command="$restore_base_command --copy-back"
-			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir2 )"
-			( PATH=${xtrabackup_path}:$PATH; innobackupex $restore_command $restore_working_dir2 &> $cycle_logfile ) 
+			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 )"
+			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - innobackupex($restore_command) failed with $rc"
+				ptb_report_error "$rpt_prefix - xtrabackup($restore_command) failed with $rc"
 				break
 			fi
 			ptb_report_file_info $cycle_logfile
@@ -304,6 +304,7 @@ ptb_validate_options usage "PTB"
 # debugging
 ptb_show_option_values "PTB"
 #exit 0
+
 if [ -n "$PTB_OPT_pidfile" ]; then
 	echo $$ > $PTB_OPT_pidfile
 fi
