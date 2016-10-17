@@ -367,7 +367,7 @@ function ptb_create_defaults_file()
 	#changed for Jenkins job
 	echo "user=jenkins" >> $file 
 	
-	echo "server-id=$instanceid" >> $file
+echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
 
 	if [ -e "${S_OPTIONSFILE[$instanceid]}" ]; then
@@ -410,7 +410,8 @@ function ptb_init_server_instance()
 		S_DATADIR[$instanceid]="${S_BASEDIR[$instanceid]}/data"
 		S_TMPDIR[$instanceid]="${S_BASEDIR[$instanceid]}/tmp"
 		S_PORT[$instanceid]="$port"
-		S_SOCKET[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.sock"
+		# S_SOCKET[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.sock"
+		S_SOCKET[$instanceid]="/tmp/mysql.sock"
 		S_PIDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.pid"
 		S_LOGFILE[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.log"
 		S_QUERYLOGFILE[$instanceid]="${S_BASEDIR[$instanceid]}/query.log"
