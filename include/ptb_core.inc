@@ -352,7 +352,8 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	
-	echo "user=jenkins" >> $file //changed for Jenkins job
+	#changed for Jenkins job
+	echo "user=jenkins" >> $file 
 	
 	echo "[mysqld]" >> $file
 	echo "basedir=${S_BINDIR[$instanceid]}" >> $file
@@ -362,7 +363,10 @@ function ptb_create_defaults_file()
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
 	echo "console" >> $file
-	echo "user=jenkins" >> $file // changed for Jenkins job
+
+	#changed for Jenkins job
+	echo "user=jenkins" >> $file 
+	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
 
