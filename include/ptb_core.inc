@@ -353,7 +353,7 @@ function ptb_create_defaults_file()
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	
 	#changed for Jenkins job
-	echo "user=jenkins" >> $file 
+	echo "user=root" >> $file 
 	
 	echo "[mysqld]" >> $file
 	echo "basedir=${S_BINDIR[$instanceid]}" >> $file
