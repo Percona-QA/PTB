@@ -352,7 +352,7 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	
-	#changed for Jenkins job
+	#changed for Jenkins job sysbench fail
 	echo "user=root" >> $file 
 	
 	echo "[mysqld]" >> $file
