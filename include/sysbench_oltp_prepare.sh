@@ -70,7 +70,9 @@ function prepare()
 		ptb_cleanup 0
 		return $rc
 	fi
-	
+	##########################################################################################
+	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/10
+	# Date: 18 october 2016
 	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost'"
 	rc=$?
 	if [ $rc -ne 0 ]; then
@@ -79,13 +81,14 @@ function prepare()
 		return $rc
 	fi
 	
-	ptb_sql $PTB_OPT_server_id "GRANT process, reload on *.* to 'jenkins'@'localhost'"
+	ptb_sql $PTB_OPT_server_id "GRANT process, reload, super, replication client on *.* to 'jenkins'@'localhost'"
 	rc=$?
 	if [ $rc -ne 0 ]; then
 		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
 		ptb_cleanup 0
 		return $rc
 	fi
+	############################################################################################
 
 	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
 
