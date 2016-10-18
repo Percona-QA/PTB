@@ -71,6 +71,7 @@ function prepare()
 		return $rc
 	fi
 	##########################################################################################
+	# START
 	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/10
 	# Date: 18 october 2016
 	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost'"
@@ -88,6 +89,7 @@ function prepare()
 		ptb_cleanup 0
 		return $rc
 	fi
+	# END
 	############################################################################################
 
 	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
