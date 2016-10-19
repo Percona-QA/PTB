@@ -2328,12 +2328,12 @@ function ptb_kill_all_tasks()
 
 PTB_STAT_PIPE=
 PTB_STAT_PID=
-PTB_STAT_TIMEOUT=3
+PTB_STAT_TIMEOUT=30
 PTB_STAT_SEQUENCE=0
 PTB_STAT_RESULT=0
 
 ################################################################################
-# INTERNAL - waits for rsult file from statistics_manager for timeout
+# INTERNAL - waits for result file from statistics_manager for timeout
 #
 # $1 - required, file to wait for
 function ptb_stat_wait_for_result()

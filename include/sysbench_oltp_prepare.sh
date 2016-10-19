@@ -74,6 +74,8 @@ function prepare()
 	# START
 	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/10
 	# Date: 18 october 2016
+	# Future improvement -> add command parsing option for user and password in xtrabackup_common.inc
+	# (Also see xtrabackup_incremental_backup.sh)
 	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost'"
 	rc=$?
 	if [ $rc -ne 0 ]; then
