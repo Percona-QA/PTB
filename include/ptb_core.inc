@@ -2376,7 +2376,7 @@ function ptb_stat_send_command()
 	rc=$?
 	if [ $rc -ne 0 ]; then
 		ptb_report_error "$rpt_prefix - timed out waiting for response from statistics_manager on file ${result_file}"
-		PTB_STAT_RESULT= # Test Fix for https://github.com/Percona-QA/PTB/issues/12
+		PTB_STAT_RESULT= # Pushing Test Fix for https://github.com/Percona-QA/PTB/issues/12
 	else
 		PTB_STAT_RESULT=`cat ${result_file}`
 		rm -f $result_file

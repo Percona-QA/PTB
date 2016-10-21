@@ -192,7 +192,7 @@ function backup()
 			# update statistics
 			ptb_stat_register_row $backup_current_dir
 			local row_id=$PTB_STAT_RESULT
-			if [ "$row_id" -gt 0 ]; then # Trapped to https://github.com/Percona-QA/PTB/issues/12
+			if [ "$row_id" -gt 0 ]; then # Committed fix; Trapped to https://github.com/Percona-QA/PTB/issues/12
 				ptb_stat_set_cell_value_from_options "$row_id" ${PTB_OPT_server_option[@]} ${PTB_OPT_backup_command_option[@]} $xtrabackup_options "backup-time=${backup_total_time}"
 			fi
 
