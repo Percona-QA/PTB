@@ -51,7 +51,7 @@ function load()
 	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/13
 	# Date: 25 october 2016
 	# Adding compression column with pre-defined dictionary support
-	if[ $COMPRESSED_COLUMN -ne 0 ]; then
+	if [ $COMPRESSED_COLUMN -ne 0 ]; then
 		ptb_sql $PTB_OPT_server_id "CREATE COMPRESSION_DICTIONARY numbers ('08566691963-88624912351-16662227201-46648573979-64646226163-77505759394-75470094713-41097360717-15161106334-50535565977'); 
 "
 		rc=$?
