@@ -104,7 +104,7 @@ function prepare()
 	# Date: 25 october 2016
 	# Adding compression column with pre-defined dictionary support
 	if [ $COMPRESSED_COLUMN -ne 0 ]; then
-		ptb_sql $PTB_OPT_server_id "CREATE COMPRESSION_DICTIONARY numbers ('08566691963-88624912351-16662227201-46648573979-64646226163-77505759394-75470094713-41097360717-15161106334-50535565977'); 
+		ptb_sql $PTB_OPT_server_id "CREATE COMPRESSION_DICTIONARY numbers ('08566691963-88624912351-16662227201-46648573979-64646226163-77505759394-75470094713-41097360717-15161106334-50535565977') 
 "
 		rc=$?
 		if [ $rc -ne 0 ]; then
@@ -113,7 +113,7 @@ function prepare()
 			return $rc
 		fi
 	
-		ptb_sql $PTB_OPT_server_id "alter table sbtest1 modify `c` varchar(250) column_format compressed with compression_dictionary numbers"
+		ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest1 modify `c` varchar(250) column_format compressed with compression_dictionary numbers"
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
