@@ -137,7 +137,10 @@ function prepare()
 			return $rc
 		fi
 		# do not put surround column name with ``
-		ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest1 modify c varchar(250) column_format compressed with compression_dictionary numbers"
+		for i in 1 2 3 4 5
+		do		
+			ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i modify c varchar(250) column_format compressed with compression_dictionary numbers"
+		done
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
