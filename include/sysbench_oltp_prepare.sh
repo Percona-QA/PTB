@@ -124,7 +124,7 @@ function prepare()
 	
 	##########################################################################################
 	# START
-	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/13
+	# This is fix for : https://github.com/Percona-QA/PTB/issues/13
 	# Date: 25 october 2016
 	# Adding compression column with pre-defined dictionary support
 	if [ $COMPRESSED_COLUMN -ne 0 ]; then
