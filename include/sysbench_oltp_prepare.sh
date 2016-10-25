@@ -98,6 +98,30 @@ function prepare()
 	############################################################################################
 
 
+	
+
+	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
+
+	local i
+	for i in ${PTB_OPT_prepare_option[@]}; do
+		sysbench_cmd="${sysbench_cmd} $i"
+	done
+	sysbench_cmd="${sysbench_cmd} run"
+
+	if [ -n "$PTB_OPT_prepare_logfile" ]; then
+		echo "Running: $sysbench_cmd" >> $PTB_OPT_prepare_logfile
+		ptb_runcmdpathlog "$PTB_OPT_prepare_rootdir" "$PTB_OPT_prepare_logfile" $sysbench_cmd
+	else
+		echo "Running: $sysbench_cmd"
+		ptb_runcmdpath "$PTB_OPT_prepare_rootdir" $sysbench_cmd
+	fi
+	rc=$?
+	if [ $rc -ne 0 ]; then
+		ptb_report_error "$rpt_prefix - ptb_runcmdpath sysbench failed with $rc."
+		ptb_cleanup 0
+		return $rc
+	fi
+	
 	##########################################################################################
 	# START
 	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/13
@@ -123,31 +147,12 @@ function prepare()
 	fi
 	# END
 	############################################################################################	
-
-	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
-
-	local i
-	for i in ${PTB_OPT_prepare_option[@]}; do
-		sysbench_cmd="${sysbench_cmd} $i"
-	done
-	sysbench_cmd="${sysbench_cmd} run"
-
-	if [ -n "$PTB_OPT_prepare_logfile" ]; then
-		echo "Running: $sysbench_cmd" >> $PTB_OPT_prepare_logfile
-		ptb_runcmdpathlog "$PTB_OPT_prepare_rootdir" "$PTB_OPT_prepare_logfile" $sysbench_cmd
-	else
-		echo "Running: $sysbench_cmd"
-		ptb_runcmdpath "$PTB_OPT_prepare_rootdir" $sysbench_cmd
-	fi
-	rc=$?
-	if [ $rc -ne 0 ]; then
-		ptb_report_error "$rpt_prefix - ptb_runcmdpath sysbench failed with $rc."
-		ptb_cleanup 0
-		return $rc
-	fi
+		
 
 	ptb_cleanup 0
 	return $rc
+
+	
 }
 ################################################################################
 # Generates test descriptor based on passed sysbench arguments
