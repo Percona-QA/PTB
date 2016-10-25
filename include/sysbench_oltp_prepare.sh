@@ -75,7 +75,7 @@ function prepare()
 	fi
 	##########################################################################################
 	# START
-	# This is temporary fix for : https://github.com/Percona-QA/PTB/issues/10
+	# This is fix for : https://github.com/Percona-QA/PTB/issues/10
 	# Date: 18 october 2016
 	# Future improvement -> add command parsing option for user and password in xtrabackup_common.inc
 	# (Also see xtrabackup_incremental_backup.sh)
@@ -136,7 +136,7 @@ function prepare()
 			ptb_cleanup 0
 			return $rc
 		fi
-	
+		# do not put surround column name with ``
 		ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest1 modify c varchar(250) column_format compressed with compression_dictionary numbers"
 		rc=$?
 		if [ $rc -ne 0 ]; then
