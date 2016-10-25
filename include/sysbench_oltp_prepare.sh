@@ -113,7 +113,7 @@ function prepare()
 			return $rc
 		fi
 	
-		ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest1 modify `c` varchar(250) column_format compressed with compression_dictionary numbers"
+		ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest1 modify c varchar(250) column_format compressed with compression_dictionary numbers"
 		rc=$?
 		if [ $rc -ne 0 ]; then
 			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
