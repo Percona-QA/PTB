@@ -411,7 +411,7 @@ function ptb_init_server_instance()
 		S_TMPDIR[$instanceid]="${S_BASEDIR[$instanceid]}/tmp"
 		S_PORT[$instanceid]="$port"
 		# S_SOCKET[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.sock"
-		# Fixes issue 7
+		# Fix for https://github.com/Percona-QA/PTB/issues/7
 		S_SOCKET[$instanceid]="/tmp/mysql.sock"
 		S_PIDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.pid"
 		S_LOGFILE[$instanceid]="${S_BASEDIR[$instanceid]}/mysql.log"
