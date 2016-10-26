@@ -137,6 +137,7 @@ function prepare()
 			return $rc
 		fi
 		# do not put surround column name with ``
+		# Fix for https://github.com/Percona-QA/PTB/issues/15
 		for i in 1 2 3 4 5
 		do		
 			ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i modify c varchar(250) column_format compressed with compression_dictionary numbers"
