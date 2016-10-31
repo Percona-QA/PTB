@@ -1,7 +1,8 @@
-Percona Test Bench (c) 2013 Percona Ireland Ltd
+Percona Test Bench (c) 2013-2016 Percona
 ===============================================================================
 Originally Created 04/2013 George Ormond Lorch III
 Written by George Ormond Lorch III
+Updated by Shahriyar Rzayev
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,11 +18,11 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 
-Launchpad homepage:
-* https://launchpad.net/percona-test-bench
+Github homepage:
+* https://github.com/Percona-QA/PTB/
 
-Bazaar code repository:
-* lp:percona-test-bench
+Clone code repository:
+* git clone https://github.com/Percona-QA/PTB.git
 
 
 LICENSE
