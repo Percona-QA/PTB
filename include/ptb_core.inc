@@ -336,6 +336,8 @@ S_QUERYLOGFILE[0]=
 S_DEFAULTSFILE[0]=
 S_IDFILE[0]=
 S_OPTIONSFILE[0]=
+# innodb_page_size for 5.7 testing, You can specify page size using the values 64k, 32k, 16k (the default), 8k, or 4k
+S_INNODB_PAGE_SIZE[0]=
 
 ################################################################################
 # INTERNAL - used to create a mysql defaults file for a server instance
@@ -419,6 +421,12 @@ function ptb_init_server_instance()
 		S_DEFAULTSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/my.cnf"
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
+		# Fix for https://github.com/Percona-QA/PTB/issues/27
+		# Change here to use different innodb_page_size, default is 16k
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+		S_INNODB_PAGE_SIZE[$instanceid]="16k"
+		fi
+		
 	fi
 	ptb_report_idebug_leave "ptb_init_server_instance($1, $2, $3) = $rc"
 	return $rc
