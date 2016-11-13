@@ -151,7 +151,70 @@ function prepare()
 	fi
 	# END
 	############################################################################################	
-		
+
+	##########################################################################################
+	# START
+	# This is fix for : https://github.com/Percona-QA/PTB/issues/25
+	# Date: 13 november 2016
+	# Adding general tablespaces and transparent column compression support(zlib or lz4). Only for 5.7 version. 
+	
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+			# Creating general tablespace			
+			ptb_sql $PTB_OPT_server_id "create tablespace ts1 add datafile 'ts1.ibd' engine=innodb"
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+
+			# Keep in mind that, 
+			# Page compression is not supported for tables that reside in shared tablespaces,
+			# which include the system tablespace, the temporary tablespace, and general tablespaces.
+			# That's why need to change for loop:
+
+			for i in 6 7 8 9 10
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i tablespace=ts1"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+			
+			
+			# Altering to use transparent compression -> 'lz4'
+			for i in 1 2 3 4 5
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+	
+			# Running optimize table, because it is a requirement.
+			# Writes to the tablespace that occur after setting the new compression algorithm use the new setting,
+			# but to apply the new compression algorithm to existing pages, you must rebuild the table using OPTIMIZE TABLE.
+
+ 
+			for i in 1 2 3 4 5
+			do		
+				ptb_sql $PTB_OPT_server_id "optimize table sbtest.sbtest$i"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+				
+	# END
+	############################################################################################
 
 	ptb_cleanup 0
 	return $rc
