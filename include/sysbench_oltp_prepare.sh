@@ -127,26 +127,30 @@ function prepare()
 	# This is fix for : https://github.com/Percona-QA/PTB/issues/13
 	# Date: 25 october 2016
 	# Adding compression column with pre-defined dictionary support
-	if [ $COMPRESSED_COLUMN -ne 0 ]; then
-		ptb_sql $PTB_OPT_server_id "CREATE COMPRESSION_DICTIONARY numbers ('08566691963-88624912351-16662227201-46648573979-64646226163-77505759394-75470094713-41097360717-15161106334-50535565977') 
+	# For now this is only available with PS 5.6:
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ]; then	
+
+		if [ $COMPRESSED_COLUMN -ne 0 ]; then
+			ptb_sql $PTB_OPT_server_id "CREATE COMPRESSION_DICTIONARY numbers ('08566691963-88624912351-16662227201-46648573979-64646226163-77505759394-75470094713-41097360717-15161106334-50535565977') 
 "
-		rc=$?
-		if [ $rc -ne 0 ]; then
-			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-			ptb_cleanup 0
-			return $rc
-		fi
-		# do not put surround column name with ``
-		# Fix for https://github.com/Percona-QA/PTB/issues/15
-		for i in 1 2 3 4 5
-		do		
-			ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i modify c varchar(250) column_format compressed with compression_dictionary numbers"
-		done
-		rc=$?
-		if [ $rc -ne 0 ]; then
-			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-			ptb_cleanup 0
-			return $rc
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+			# do not put surround column name with ``
+			# Fix for https://github.com/Percona-QA/PTB/issues/15
+			for i in 1 2 3 4 5
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i modify c varchar(250) column_format compressed with compression_dictionary numbers"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
 		fi
 	fi
 	# END
@@ -212,6 +216,7 @@ function prepare()
 				ptb_cleanup 0
 				return $rc
 			fi
+	fi
 				
 	# END
 	############################################################################################
