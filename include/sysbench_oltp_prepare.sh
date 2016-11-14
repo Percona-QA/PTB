@@ -218,7 +218,7 @@ function prepare()
 			fi
 
 			# Fix for https://github.com/Percona-QA/PTB/issues/26
-			# Date 15 november 2016
+			# Date: 15 november 2016
 			# Altering tables to use tablespace encryption
 			
 			for i in 1 2 3 4 5

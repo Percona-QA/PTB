@@ -124,7 +124,8 @@ function restore()
 			fi 
 
 			# do the first prepare
-			local restore_command="$restore_base_command --prepare --apply-log-only"
+			# Fix for https://github.com/Percona-QA/PTB/issues/26
+			local restore_command="$restore_base_command --prepare --apply-log-only --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 
 			# if we are preparing the base...
 			if [ $current_cycle -eq 0 ]; then
@@ -162,7 +163,8 @@ function restore()
 			fi
 
 			# do the final apply log
-			restore_command="$restore_base_command --prepare"
+			# Fix for https://github.com/Percona-QA/PTB/issues/26
+			restore_command="$restore_base_command --prepare --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command $restore_working_dir2 )"
 			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?

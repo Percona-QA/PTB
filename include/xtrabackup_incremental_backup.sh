@@ -180,8 +180,8 @@ function backup()
 				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null )"
 				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null 2> $cycle_logfile )
 			else
-				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir  --backup )"
-				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --backup 2> $cycle_logfile )
+				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir  --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup )"
+				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup 2> $cycle_logfile )
 			fi
 			rc=$?
 			local backup_total_time=`expr $SECONDS - $backup_start_time`
@@ -197,7 +197,7 @@ function backup()
 			fi
 
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - xtrabackup($backup_command $inc_backup_command --target-dir=$backup_current_dir --backup) failed with $rc"
+				ptb_report_error "$rpt_prefix - xtrabackup($backup_command $inc_backup_command --target-dir=$backup_current_dir --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup) failed with $rc"
 				break
 			fi
 
