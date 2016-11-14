@@ -364,6 +364,7 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
+	# Fix for https://github.com/Percona-QA/PTB/issues/27
 	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
 	echo "console" >> $file
 
