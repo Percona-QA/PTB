@@ -424,7 +424,7 @@ function ptb_init_server_instance()
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
 		# Change here to use different innodb_page_size, default is 16k
 		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
-		S_INNODB_PAGE_SIZE[$instanceid]="16k"
+		S_INNODB_PAGE_SIZE[$instanceid]="64k"
 		fi
 		
 	fi
