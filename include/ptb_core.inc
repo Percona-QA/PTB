@@ -364,6 +364,7 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
+	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
 	echo "console" >> $file
 
 	#changed for Jenkins job
@@ -541,6 +542,7 @@ function ptb_delete_server_instance()
 		S_DEFAULTSFILE[$instanceid]=
 		S_OPTIONSFILE[$instanceid]=
 		S_IDFILE[$instanceid]=
+		S_INNODB_PAGE_SIZE[$instanceid]=
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
 	return $rc
