@@ -338,6 +338,10 @@ S_IDFILE[0]=
 S_OPTIONSFILE[0]=
 # innodb_page_size for 5.7 testing, You can specify page size using the values 64k, 32k, 16k (the default), 8k, or 4k
 S_INNODB_PAGE_SIZE[0]=
+# Innodb tablespace encryption plugin
+S_EARLY_PLUGIN_LOAD[0]=
+S_KEYRING_FILE_DATA[0]=
+
 
 ################################################################################
 # INTERNAL - used to create a mysql defaults file for a server instance
@@ -366,6 +370,9 @@ function ptb_create_defaults_file()
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
 	# Fix for https://github.com/Percona-QA/PTB/issues/27
 	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
+	# Fix for https://github.com/Percona-QA/PTB/issues/26
+	echo "early_plugin_load=${S_EARLY_PLUGIN_LOAD[$instanceid]}" >> $file
+	echo "keyring_file_data=${S_KEYRING_FILE_DATA[$instanceid]}" >> $file
 	echo "console" >> $file
 
 	#changed for Jenkins job
@@ -423,10 +430,13 @@ function ptb_init_server_instance()
 		S_DEFAULTSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/my.cnf"
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
-		# Fix for https://github.com/Percona-QA/PTB/issues/27
-		# Change here to use different innodb_page_size, default is 16k
 		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+		# Fix for https://github.com/Percona-QA/PTB/issues/27
+		# Change here to use different innodb_page_size, default is 16k		
 		S_INNODB_PAGE_SIZE[$instanceid]="64k"
+		# Fix for https://github.com/Percona-QA/PTB/issues/26
+		S_EARLY_PLUGIN_LOAD[$instanceid]="keyring_file.so"
+		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/data/keyring"
 		fi
 		
 	fi
@@ -544,6 +554,8 @@ function ptb_delete_server_instance()
 		S_OPTIONSFILE[$instanceid]=
 		S_IDFILE[$instanceid]=
 		S_INNODB_PAGE_SIZE[$instanceid]=
+		S_EARLY_PLUGIN_LOAD[$instanceid]=
+		S_KEYRING_FILE_DATA[$instanceid]=
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
 	return $rc
