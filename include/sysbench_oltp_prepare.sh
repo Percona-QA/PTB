@@ -207,7 +207,7 @@ function prepare()
 			# Altering to use transparent compression -> 'lz4' or 'zlib'
 			for i in 1 2 3 4 5
 			do		
-				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='zlib'"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
 			done
 			rc=$?
 			if [ $rc -ne 0 ]; then
