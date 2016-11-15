@@ -193,9 +193,9 @@ function prepare()
 			for i in 6 7 8 9 10
 			do		
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) virtual"
-				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) stored"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_s json generated always as (json_array(k,c,pad)) stored"
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_index varchar(255) generated always as (json_array(k,c,pad)) stored"	
-				ptb_sql $PTB_OPT_server_id "alter table sbtest$i add index(json_test_index)"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add index(json_test_index)"
 			done
 			rc=$?
 			if [ $rc -ne 0 ]; then
@@ -252,9 +252,9 @@ function prepare()
 			for i in 1 2 3 4 5
 			do		
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) virtual"
-				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) stored"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_s json generated always as (json_array(k,c,pad)) stored"
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_index varchar(255) generated always as (json_array(k,c,pad)) stored"	
-				ptb_sql $PTB_OPT_server_id "alter table sbtest$i add index(json_test_index)"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add index(json_test_index)"
 			done
 			rc=$?
 			if [ $rc -ne 0 ]; then
