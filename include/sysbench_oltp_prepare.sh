@@ -188,11 +188,26 @@ function prepare()
 				return $rc
 			fi
 			
+			# Fix for https://github.com/Percona-QA/PTB/issues/32
+			# and Fix for https://github.com/Percona-QA/PTB/issues/33
+			for i in 6 7 8 9 10
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) virtual"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) stored"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_index varchar(255) generated always as (json_array(k,c,pad)) stored"	
+				ptb_sql $PTB_OPT_server_id "alter table sbtest$i add index(json_test_index)"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
 			
-			# Altering to use transparent compression -> 'lz4'
+			# Altering to use transparent compression -> 'lz4' or 'zlib'
 			for i in 1 2 3 4 5
 			do		
-				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='zlib'"
 			done
 			rc=$?
 			if [ $rc -ne 0 ]; then
@@ -224,6 +239,22 @@ function prepare()
 			for i in 1 2 3 4 5
 			do		
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i encryption='Y'"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
+			fi
+
+			# Fix for https://github.com/Percona-QA/PTB/issues/32
+			# and Fix for https://github.com/Percona-QA/PTB/issues/33
+			for i in 1 2 3 4 5
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) virtual"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_v json generated always as (json_array(k,c,pad)) stored"
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i add column json_test_index varchar(255) generated always as (json_array(k,c,pad)) stored"	
+				ptb_sql $PTB_OPT_server_id "alter table sbtest$i add index(json_test_index)"
 			done
 			rc=$?
 			if [ $rc -ne 0 ]; then
