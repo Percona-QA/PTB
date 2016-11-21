@@ -330,22 +330,37 @@ function ptb_creatersa()
 	
 	local rsa_path=$1
 	# Generating RSA keys
-	ptb_runcmd openssl genrsa -out $rsa_path/private_key.pem 2048
-	ptb_runcmd openssl rsa -in $rsa_path/private_key.pem -pubout -out $rsa_path/public_key.pem
-	ptb_runcmd chmod 400 $rsa_path/private_key.pem
-	ptb_runcmd chmod 444 $rsa_path/public_key.pem
+	ptb_runcmd openssl genrsa -out ${rsa_path}/private_key.pem 2048
+	ptb_runcmd openssl rsa -in ${rsa_path}/private_key.pem -pubout -out $rsa_path/public_key.pem
+	ptb_runcmd chmod 400 ${rsa_path}/private_key.pem
+	ptb_runcmd chmod 444 ${rsa_path}/public_key.pem
   
 }
 ################################################################################
 # INTERNAL - used to create SSL certificates.
 # 
-# $1 - required, server instance id.
-# $2 - required, path. Will store SSL things there.
+# $1 - required, path. Will store SSL things there.
 
-#function ptb_createssl()
-#{
-#		
-#}
+function ptb_createssl()
+{
+	local ssl_path=$1/newcerts
+	ptb_runcmd mkdir ${ssl_path}
+
+ 	# Create CA certificate
+	ptb_runcmd openssl genrsa 2048 > ${ssl_path}/ca-key.pem 
+	ptb_runcmd openssl req -new -x509 -nodes -days 3600 -key ${ssl_path}/ca-key.pem -out ${ssl_path}/ca.pem -subj '/CN=www.hero1.RAMESH/O=Database Performance./C=US'
+	# Create server certificate, remove passphrase, and sign it
+	# server-cert.pem = public key, server-key.pem = private key
+	ptb_runcmd openssl req -newkey rsa:2048 -days 3600 -nodes -keyout ${ssl_path}/server-key.pem -out ${ssl_path}/server-req.pem -subj '/CN=www.hero2.RAMESH/O=Database Performance./C=AU'
+  	ptb_runcmd openssl rsa -in ${ssl_path}/server-key.pem -out ${ssl_path}/server-key.pem
+	ptb_runcmd openssl x509 -req -in ${ssl_path}/server-req.pem -days 3600 -CA ${ssl_path}/ca.pem -CAkey ${ssl_path}/ca-key.pem -set_serial 01 -out ${ssl_path}/server-cert.pem
+
+	# Create client certificate, remove passphrase, and sign it
+	# client-cert.pem = public key, client-key.pem = private key
+	ptb_runcmd openssl req -newkey rsa:2048 -days 3600 -nodes -keyout ${ssl_path}/client-key.pem -out ${ssl_path}/client-req.pem -subj '/CN=www.hero3.RAMESH/O=Database Performance./C=AU'
+	ptb_runcmd  openssl rsa -in ${ssl_path}/client-key.pem -out ${ssl_path}/client-key.pem
+	ptb_runcmd openssl x509 -req -in ${ssl_path}/client-req.pem -days 3600 -CA ${ssl_path}/ca.pem -CAkey ${ssl_path}/ca-key.pem -set_serial 01 -out ${ssl_path}/client-cert.pem	
+}
 ####################################
 # MySQl server instance management #
 ####################################
@@ -388,7 +403,10 @@ function ptb_create_defaults_file()
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	
 	#changed for Jenkins job sysbench fail
-	echo "user=root" >> $file 
+	echo "user=root" >> $file
+	echo "ssl-ca=${S_BASEDIR[$instanceid]}/newcerts/ca.pem" >> $file
+	echo "ssl-cert=${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem" >> $file
+	echo "ssl-key=${S_BASEDIR[$instanceid]}/newcerts/client-key.pem " >> $file
 	
 	echo "[mysqld]" >> $file
 	echo "basedir=${S_BINDIR[$instanceid]}" >> $file
@@ -403,11 +421,15 @@ function ptb_create_defaults_file()
 	echo "early_plugin_load=${S_EARLY_PLUGIN_LOAD[$instanceid]}" >> $file
 	echo "keyring_file_data=${S_KEYRING_FILE_DATA[$instanceid]}" >> $file
 	echo "console" >> $file
-
+	
 	#changed for Jenkins job
 	echo "user=jenkins" >> $file 
+	# ssl goodies
+	echo "ssl-ca=${S_BASEDIR[$instanceid]}/newcerts/ca.pem" >> $file
+	echo "ssl-cert=${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem" >> $file
+	echo "ssl-key=${S_BASEDIR[$instanceid]}/newcerts/server-key.pem" >> $file
 	
-echo "server-id=$instanceid" >> $file
+	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
 
 	if [ -e "${S_OPTIONSFILE[$instanceid]}" ]; then
@@ -469,6 +491,12 @@ function ptb_init_server_instance()
 		fi
 		# Generating RSA keys
 		ptb_creatersa "${S_DATADIR[$instanceid]}"
+		# Creating SSL things
+		ptb_createssl "${S_BASEDIR[$instanceid]}"
+		S_SSL_CA[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/ca.pem"
+		S_SSL_CERT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem"
+		S_SSL_KEY[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-key.pem"
+		
 		
 	fi
 	ptb_report_idebug_leave "ptb_init_server_instance($1, $2, $3) = $rc"
@@ -587,6 +615,9 @@ function ptb_delete_server_instance()
 		S_INNODB_PAGE_SIZE[$instanceid]=
 		S_EARLY_PLUGIN_LOAD[$instanceid]=
 		S_KEYRING_FILE_DATA[$instanceid]=
+		S_SSL_CA[$instanceid]=
+		S_SSL_CERT[$instanceid]=
+		S_SSL_KEY[$instanceid]=
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
 	return $rc
