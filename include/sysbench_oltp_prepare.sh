@@ -79,7 +79,16 @@ function prepare()
 	# Date: 18 october 2016
 	# Future improvement -> add command parsing option for user and password in xtrabackup_common.inc
 	# (Also see xtrabackup_incremental_backup.sh)
-	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost'"
+	# UPDATE: 21 november 2016 -> https://github.com/Percona-QA/PTB/issues/31 -> Updating jenkins user to be created using sha256_password plugin
+	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost' IDENTIFIED WITH sha256_password"
+	rc=$?
+	if [ $rc -ne 0 ]; then
+		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+		ptb_cleanup 0
+		return $rc
+	fi
+	
+	ptb_sql $PTB_OPT_server_id "SET old_passwords = 2"
 	rc=$?
 	if [ $rc -ne 0 ]; then
 		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
@@ -96,8 +105,6 @@ function prepare()
 	fi
 	# END
 	############################################################################################
-
-
 	
 
 	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
