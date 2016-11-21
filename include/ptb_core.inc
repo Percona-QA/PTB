@@ -468,7 +468,7 @@ function ptb_init_server_instance()
 		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/data/keyring"
 		fi
 		# Generating RSA keys
-		ptb_creatersa "${S_DATADIR}"
+		ptb_creatersa "${S_DATADIR[$instanceid]}"
 		
 	fi
 	ptb_report_idebug_leave "ptb_init_server_instance($1, $2, $3) = $rc"
