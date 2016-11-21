@@ -321,6 +321,31 @@ function ptb_runcmdpathlog()
 }
 
 
+################################################################################
+# INTERNAL - used to create SSL certificates and RSA keys.
+# 
+# $1 - required, server datadir path. Will store RSA keys there.
+function ptb_creatersa()
+{
+	
+	local rsa_path=$1
+	# Generating RSA keys
+	ptb_runcmd openssl genrsa -out $rsa_path/private_key.pem 2048
+	ptb_runcmd openssl rsa -in $rsa_path/private_key.pem -pubout -out $rsa_path/public_key.pem
+	ptb_runcmd chmod 400 $rsa_path/private_key.pem
+	ptb_runcmd chmod 444 $rsa_path/public_key.pem
+  
+}
+################################################################################
+# INTERNAL - used to create SSL certificates.
+# 
+# $1 - required, server instance id.
+# $2 - required, path. Will store SSL things there.
+
+function ptb_createssl()
+{
+		
+}
 ####################################
 # MySQl server instance management #
 ####################################
@@ -341,6 +366,10 @@ S_INNODB_PAGE_SIZE[0]=
 # Innodb tablespace encryption plugin
 S_EARLY_PLUGIN_LOAD[0]=
 S_KEYRING_FILE_DATA[0]=
+# Starting server with SSL
+S_SSL_CA[0]=
+S_SSL_CERT[0]=
+S_SSL_KEY[0]=
 
 
 ################################################################################
@@ -438,6 +467,8 @@ function ptb_init_server_instance()
 		S_EARLY_PLUGIN_LOAD[$instanceid]="keyring_file.so"
 		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/data/keyring"
 		fi
+		# Generating RSA keys
+		ptb_creatersa "${S_DATADIR}"
 		
 	fi
 	ptb_report_idebug_leave "ptb_init_server_instance($1, $2, $3) = $rc"
