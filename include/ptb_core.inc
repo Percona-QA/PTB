@@ -342,10 +342,10 @@ function ptb_creatersa()
 # $1 - required, server instance id.
 # $2 - required, path. Will store SSL things there.
 
-function ptb_createssl()
-{
-		
-}
+#function ptb_createssl()
+#{
+#		
+#}
 ####################################
 # MySQl server instance management #
 ####################################
