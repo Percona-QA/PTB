@@ -212,16 +212,16 @@ function prepare()
 			fi
 			
 			# Altering to use transparent compression -> 'lz4' or 'zlib'
-			for i in 1 2 3 4 5
-			do		
-				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
-			done
-			rc=$?
-			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-				ptb_cleanup 0
-				return $rc
-			fi
+#			for i in 1 2 3 4 5
+#			do		
+#				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
+#			done
+#			rc=$?
+#			if [ $rc -ne 0 ]; then
+#				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+#				ptb_cleanup 0
+#				return $rc
+#			fi
 	
 			# Running optimize table, because it is a requirement.
 			# Writes to the tablespace that occur after setting the new compression algorithm use the new setting,
