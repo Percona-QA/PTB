@@ -327,6 +327,7 @@ function ptb_runcmdpathlog()
 # $1 - required, server datadir path. Will store RSA keys there.
 function ptb_creatersa()
 {
+	ptb_report_idebug_enter "ptb_creatersa()"	
 	
 	local rsa_path=$1
 	# Generating RSA keys
@@ -343,6 +344,8 @@ function ptb_creatersa()
 
 function ptb_createssl()
 {
+	ptb_report_idebug_enter "ptb_createssl()"
+
 	local ssl_path=$1/newcerts
 	ptb_runcmd mkdir ${ssl_path}
 
@@ -489,10 +492,6 @@ function ptb_init_server_instance()
 		S_EARLY_PLUGIN_LOAD[$instanceid]="keyring_file.so"
 		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/data/keyring"
 		fi
-		# Generating RSA keys
-		ptb_creatersa "${S_DATADIR[$instanceid]}"
-		# Creating SSL things
-		ptb_createssl "${S_BASEDIR[$instanceid]}"
 		S_SSL_CA[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/ca.pem"
 		S_SSL_CERT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem"
 		S_SSL_KEY[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-key.pem"
@@ -648,6 +647,9 @@ function ptb_delete_all_server_instances()
 function ptb_create_server_data()
 {
 	ptb_report_idebug_enter "ptb_create_server_data($1)"
+	
+	# Creating SSL things
+	ptb_createssl "${S_BASEDIR[$instanceid]}"
 
 	local instanceid=$1
 	local rc=$PTB_RET_SUCCESS
@@ -667,8 +669,12 @@ function ptb_create_server_data()
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
 		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
 			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysqld --defaults-file=${S_DEFAULTSFILE[$instanceid]} --initialize-insecure --basedir=${S_BINDIR[$instanceid]}
+			# Generating RSA keys inside datadir
+			ptb_creatersa "${S_DATADIR[$instanceid]}"
 		else
 			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysql_install_db --defaults-file=${S_DEFAULTSFILE[$instanceid]} --basedir=${S_BINDIR[$instanceid]}
+			# Generating RSA keys inside datadir
+			ptb_creatersa "${S_DATADIR[$instanceid]}"
 		fi
 		rc=$?
 		if [ $rc -ne 0 ]; then
