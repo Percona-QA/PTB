@@ -116,7 +116,7 @@ function backup()
 		return $rc
 	fi
 
-	local backup_command="--defaults-file=${S_DEFAULTSFILE[$PTB_OPT_server_id]}"
+	local backup_command="--defaults-file=${S_DEFAULTSFILE[$PTB_OPT_server_id]} --no-version-check"
 	backup_command="$backup_command --no-timestamp"
 	backup_command="$backup_command --tmpdir=$PTB_OPT_vardir"
 	backup_command="$backup_command $xb_backup_command_options"

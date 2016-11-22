@@ -66,7 +66,7 @@ function restore()
 		return $rc
 	fi
 
-	local restore_base_command="--defaults-file=${S_DEFAULTSFILE[${PTB_OPT_server_id}]}"
+	local restore_base_command="--defaults-file=${S_DEFAULTSFILE[${PTB_OPT_server_id}]} --no-version-check"
 	restore_base_command="$restore_base_command $xb_restore_command_options"
 
 	# loop through full backups
@@ -187,7 +187,7 @@ function restore()
 			fi
 
 			# copy back
-			restore_command="$restore_base_command --copy-back"
+			restore_command="$restore_base_command --copy-back --no-version-check"
 			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 )"
 			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?
