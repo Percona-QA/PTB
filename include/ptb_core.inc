@@ -388,7 +388,10 @@ S_KEYRING_FILE_DATA[0]=
 S_SSL_CA[0]=
 S_SSL_CERT[0]=
 S_SSL_KEY[0]=
-
+# Client SSL
+S_SSL_CA_CLIENT[0]=
+S_SSL_CERT_CLIENT[0]=
+S_SSL_KEY_CLIENT[0]=
 
 ################################################################################
 # INTERNAL - used to create a mysql defaults file for a server instance
@@ -495,6 +498,10 @@ function ptb_init_server_instance()
 		S_SSL_CA[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/ca.pem"
 		S_SSL_CERT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem"
 		S_SSL_KEY[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-key.pem"
+		# Client SSL
+		S_SSL_CA_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/ca.pem"
+		S_SSL_CERT_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem"
+		S_SSL_KEY_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-key.pem"
 		
 		
 	fi
@@ -617,6 +624,10 @@ function ptb_delete_server_instance()
 		S_SSL_CA[$instanceid]=
 		S_SSL_CERT[$instanceid]=
 		S_SSL_KEY[$instanceid]=
+		S_SSL_CA_CLIENT[$instanceid]=
+		S_SSL_CERT_CLIENT[$instanceid]=
+		S_SSL_KEY_CLIENT[$instanceid]=
+		
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
 	return $rc

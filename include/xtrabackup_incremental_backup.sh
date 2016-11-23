@@ -117,9 +117,13 @@ function backup()
 	fi
 
 	local backup_command="--defaults-file=${S_DEFAULTSFILE[$PTB_OPT_server_id]} --no-version-check"
+	local backup_ssl="--ssl=1 --ssl-ca=${S_SSL_CA_CLIENT[$PTB_OPT_server_id]} --ssl-cert=${S_SSL_CERT_CLIENT[$PTB_OPT_server_id]} --ssl-key=${S_SSL_KEY_CLIENT[$PTB_OPT_server_id]}"
+	local backup_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 	backup_command="$backup_command --no-timestamp"
 	backup_command="$backup_command --tmpdir=$PTB_OPT_vardir"
 	backup_command="$backup_command $xb_backup_command_options"
+	backup_command="$backup_command $backup_ssl"
+	backup_command="$backup_command $backup_keyring_plugin"
 
 	ptb_report_info "$rpt_prefix - Beginning backup test with basic options ${backup_command}"
 
@@ -180,8 +184,8 @@ function backup()
 				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null )"
 				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --stream=xbstream --target-dir=$backup_current_dir --backup 1>/dev/null 2> $cycle_logfile )
 			else
-				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir  --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup )"
-				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup 2> $cycle_logfile )
+				ptb_report_info "$rpt_ptrfix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --backup )"
+				( PATH=${xtrabackup_path}:$PATH; xtrabackup $backup_command $inc_backup_command --target-dir=$backup_current_dir --backup 2> $cycle_logfile )
 			fi
 			rc=$?
 			local backup_total_time=`expr $SECONDS - $backup_start_time`
@@ -197,7 +201,7 @@ function backup()
 			fi
 
 			if [ $rc -ne 0 ]; then
-				ptb_report_error "$rpt_prefix - xtrabackup($backup_command $inc_backup_command --target-dir=$backup_current_dir --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]} --backup) failed with $rc"
+				ptb_report_error "$rpt_prefix - xtrabackup($backup_command $inc_backup_command --target-dir=$backup_current_dir --backup) failed with $rc"
 				break
 			fi
 

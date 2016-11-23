@@ -67,7 +67,9 @@ function restore()
 	fi
 
 	local restore_base_command="--defaults-file=${S_DEFAULTSFILE[${PTB_OPT_server_id}]} --no-version-check"
+	local restore_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 	restore_base_command="$restore_base_command $xb_restore_command_options"
+	restore_base_command="$restore_base_command $restore_keyring_plugin"
 
 	# loop through full backups
 	local full_cycle=0
@@ -125,7 +127,7 @@ function restore()
 
 			# do the first prepare
 			# Fix for https://github.com/Percona-QA/PTB/issues/26
-			local restore_command="$restore_base_command --prepare --apply-log-only --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
+			local restore_command="$restore_base_command --prepare --apply-log-only"
 
 			# if we are preparing the base...
 			if [ $current_cycle -eq 0 ]; then
@@ -164,7 +166,7 @@ function restore()
 
 			# do the final apply log
 			# Fix for https://github.com/Percona-QA/PTB/issues/26
-			restore_command="$restore_base_command --prepare --keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
+			restore_command="$restore_base_command --prepare"
 			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command $restore_working_dir2 )"
 			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?
@@ -187,7 +189,7 @@ function restore()
 			fi
 
 			# copy back
-			restore_command="$restore_base_command --copy-back --no-version-check"
+			restore_command="$restore_base_command --copy-back"
 			ptb_report_info "$rpt_prefix - ( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 )"
 			( PATH=${xtrabackup_path}:$PATH; xtrabackup $restore_command --target-dir=$restore_working_dir2 &> $cycle_logfile ) 
 			rc=$?
