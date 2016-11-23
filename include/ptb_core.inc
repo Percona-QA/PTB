@@ -410,9 +410,9 @@ function ptb_create_defaults_file()
 	
 	#changed for Jenkins job sysbench fail
 	echo "user=root" >> $file
-	echo "ssl-ca=${S_BASEDIR[$instanceid]}/newcerts/ca.pem" >> $file
-	echo "ssl-cert=${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem" >> $file
-	echo "ssl-key=${S_BASEDIR[$instanceid]}/newcerts/client-key.pem " >> $file
+	echo "ssl-ca=${S_SSL_CA_CLIENT[$instanceid]}" >> $file
+	echo "ssl-cert=${S_SSL_CERT_CLIENT[$instanceid]}" >> $file
+	echo "ssl-key=${S_SSL_KEY_CLIENT[$instanceid]}" >> $file
 	
 	echo "[mysqld]" >> $file
 	echo "basedir=${S_BINDIR[$instanceid]}" >> $file
@@ -431,9 +431,9 @@ function ptb_create_defaults_file()
 	#changed for Jenkins job
 	echo "user=jenkins" >> $file 
 	# ssl goodies
-	echo "ssl-ca=${S_BASEDIR[$instanceid]}/newcerts/ca.pem" >> $file
-	echo "ssl-cert=${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem" >> $file
-	echo "ssl-key=${S_BASEDIR[$instanceid]}/newcerts/server-key.pem" >> $file
+	echo "ssl-ca=${S_SSL_CA[$instanceid]}" >> $file
+	echo "ssl-cert=${S_SSL_CERT[$instanceid]}" >> $file
+	echo "ssl-key=${S_SSL_KEY[$instanceid]}" >> $file
 	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
@@ -493,7 +493,8 @@ function ptb_init_server_instance()
 		S_INNODB_PAGE_SIZE[$instanceid]="64k"
 		# Fix for https://github.com/Percona-QA/PTB/issues/26
 		S_EARLY_PLUGIN_LOAD[$instanceid]="keyring_file.so"
-		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/data/keyring"
+		# Fix for https://github.com/Percona-QA/PTB/issues/42 -> keep keyring file outside datadir
+		S_KEYRING_FILE_DATA[$instanceid]="${S_BASEDIR[$instanceid]}/keyring"
 		fi
 		S_SSL_CA[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/ca.pem"
 		S_SSL_CERT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/server-cert.pem"
