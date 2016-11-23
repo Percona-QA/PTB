@@ -421,11 +421,13 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
 	# Fix for https://github.com/Percona-QA/PTB/issues/27
 	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
 	# Fix for https://github.com/Percona-QA/PTB/issues/26
 	echo "early_plugin_load=${S_EARLY_PLUGIN_LOAD[$instanceid]}" >> $file
 	echo "keyring_file_data=${S_KEYRING_FILE_DATA[$instanceid]}" >> $file
+	fi
 	echo "console" >> $file
 	
 	#changed for Jenkins job
