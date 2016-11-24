@@ -80,21 +80,32 @@ function prepare()
 	# Future improvement -> add command parsing option for user and password in xtrabackup_common.inc
 	# (Also see xtrabackup_incremental_backup.sh)
 	# UPDATE: 21 november 2016 -> https://github.com/Percona-QA/PTB/issues/31 -> Updating jenkins user to be created using sha256_password plugin
-	ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost' IDENTIFIED WITH sha256_password"
-	rc=$?
-	if [ $rc -ne 0 ]; then
-		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-		ptb_cleanup 0
-		return $rc
+	# UPDATE: 24 november 2016 -> https://github.com/Percona-QA/PTB/issues/45 -> Add check for server version
+	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
+		
+		ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost' IDENTIFIED WITH sha256_password"
+		rc=$?
+		if [ $rc -ne 0 ]; then
+			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+			ptb_cleanup 0
+			return $rc
+		fi
+	else 
+		ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost'"
+		rc=$?
+		if [ $rc -ne 0 ]; then
+			ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+			ptb_cleanup 0
+			return $rc
+		fi
 	fi
-	
-	ptb_sql $PTB_OPT_server_id "SET old_passwords = 2"
-	rc=$?
-	if [ $rc -ne 0 ]; then
-		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-		ptb_cleanup 0
-		return $rc
-	fi
+#	ptb_sql $PTB_OPT_server_id "SET old_passwords = 2"
+#	rc=$?
+#	if [ $rc -ne 0 ]; then
+#		ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+#		ptb_cleanup 0
+#		return $rc
+#	fi
 	
 	ptb_sql $PTB_OPT_server_id "GRANT process, reload, super, replication client on *.* to 'jenkins'@'localhost'"
 	rc=$?
