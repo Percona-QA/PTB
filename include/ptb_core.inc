@@ -392,6 +392,14 @@ S_SSL_KEY[0]=
 S_SSL_CA_CLIENT[0]=
 S_SSL_CERT_CLIENT[0]=
 S_SSL_KEY_CLIENT[0]=
+# Enabling GTID
+S_MASTER_INFO_REPOSTORY[0]=
+S_RELAY_LOG_INFO_REPOSITORY[0]=
+S_GTID_MODE[0]=
+#S_LOG_SLAVE_UPDATES[0]=
+#S_ENFORCE_GTID_CONSISTENCY[0]=
+
+
 
 ################################################################################
 # INTERNAL - used to create a mysql defaults file for a server instance
@@ -439,6 +447,14 @@ function ptb_create_defaults_file()
 	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
+	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	echo "master-info-repository=${S_MASTER_INFO_REPOSTORY[$instanceid]}" >> $file
+	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
+	echo "gtid_mode=${S_GTID_MODE[$instanceid]}" >> $file
+	echo "log-slave-updates" >> $file
+	echo "enforce-gtid-consistency" >> $file
+
+	fi
 
 	if [ -e "${S_OPTIONSFILE[$instanceid]}" ]; then
 		local line=
@@ -506,6 +522,13 @@ function ptb_init_server_instance()
 		S_SSL_CERT_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem"
 		S_SSL_KEY_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-key.pem"
 		
+		if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
+		# GTID
+		S_MASTER_INFO_REPOSTORY[$instanceid]="table"
+		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]="table"
+		S_GTID_MODE[$instanceid]="ON"
+		fi
+			
 		
 	fi
 	ptb_report_idebug_leave "ptb_init_server_instance($1, $2, $3) = $rc"
@@ -630,6 +653,9 @@ function ptb_delete_server_instance()
 		S_SSL_CA_CLIENT[$instanceid]=
 		S_SSL_CERT_CLIENT[$instanceid]=
 		S_SSL_KEY_CLIENT[$instanceid]=
+		S_MASTER_INFO_REPOSTORY[$instanceid]=
+		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]=
+		S_GTID_MODE[$instanceid]=
 		
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
