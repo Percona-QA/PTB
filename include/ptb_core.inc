@@ -451,8 +451,8 @@ function ptb_create_defaults_file()
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "gtid_mode=${S_GTID_MODE[$instanceid]}" >> $file
-	echo "log-slave-updates" >> $file
-	echo "enforce-gtid-consistency" >> $file
+	#echo "log-slave-updates" >> $file
+	#echo "enforce-gtid-consistency" >> $file
 
 	fi
 
