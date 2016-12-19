@@ -447,7 +447,7 @@ function ptb_create_defaults_file()
 	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
-	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "gtid_mode=${S_GTID_MODE[$instanceid]}" >> $file
@@ -522,7 +522,7 @@ function ptb_init_server_instance()
 		S_SSL_CERT_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem"
 		S_SSL_KEY_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-key.pem"
 		
-		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
 		# GTID
 		S_MASTER_INFO_REPOSITORY[$instanceid]="table"
 		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]="table"
