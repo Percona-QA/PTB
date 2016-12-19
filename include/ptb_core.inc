@@ -452,8 +452,8 @@ function ptb_create_defaults_file()
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "gtid_mode=${S_GTID_MODE[$instanceid]}" >> $file
-	#echo "log-slave-updates" >> $file
-	#echo "enforce-gtid-consistency" >> $file
+	echo "log-slave-updates" >> $file
+	echo "enforce-gtid-consistency" >> $file
 
 	fi
 
@@ -655,7 +655,7 @@ function ptb_delete_server_instance()
 		S_SSL_CA_CLIENT[$instanceid]=
 		S_SSL_CERT_CLIENT[$instanceid]=
 		S_SSL_KEY_CLIENT[$instanceid]=
-		S_MASTER_INFO_REPOSTORY[$instanceid]=
+		S_MASTER_INFO_REPOSITORY[$instanceid]=
 		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]=
 		S_GTID_MODE[$instanceid]=
 		
