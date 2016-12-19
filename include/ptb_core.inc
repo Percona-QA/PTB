@@ -398,7 +398,9 @@ S_RELAY_LOG_INFO_REPOSITORY[0]=
 S_GTID_MODE[0]=
 #S_LOG_SLAVE_UPDATES[0]=
 #S_ENFORCE_GTID_CONSISTENCY[0]=
-
+# Storing InnoDB Undo Logs in Separate Tablespaces
+S_INNODB_UNDO_TABLESPACES[0]=
+S_INNODB_UNDO_LOGS[0]=
 
 
 ################################################################################
@@ -448,12 +450,15 @@ function ptb_create_defaults_file()
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
 	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	# GTID	
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "gtid_mode=${S_GTID_MODE[$instanceid]}" >> $file
 	echo "log-slave-updates" >> $file
 	echo "enforce-gtid-consistency" >> $file
-
+	# UNDO tablespaces
+	echo "innodb_undo_tablespaces=${S_INNODB_UNDO_TABLESPACES[$instanceid]}" >> $file
+	echo "innodb_undo_logs=${S_INNODB_UNDO_LOGS[$instanceid]}" >> $file
 	fi
 
 	if [ -e "${S_OPTIONSFILE[$instanceid]}" ]; then
@@ -527,6 +532,10 @@ function ptb_init_server_instance()
 		S_MASTER_INFO_REPOSITORY[$instanceid]="table"
 		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]="table"
 		S_GTID_MODE[$instanceid]="ON"
+		# UNDO tablespaces
+		S_INNODB_UNDO_TABLESPACES[$instanceid]="10"
+		S_INNODB_UNDO_LOGS[$instanceid]="128"
+		
 		fi
 			
 		
@@ -656,6 +665,8 @@ function ptb_delete_server_instance()
 		S_MASTER_INFO_REPOSITORY[$instanceid]=
 		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]=
 		S_GTID_MODE[$instanceid]=
+		S_INNODB_UNDO_TABLESPACES[$instanceid]=
+		S_INNODB_UNDO_LOGS[$instanceid]=
 		
 	fi
 	ptb_report_idebug_leave "ptb_delete_server_instance($1) = $rc"
