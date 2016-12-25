@@ -510,7 +510,6 @@ function ptb_init_server_instance()
 		S_DEFAULTSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/my.cnf"
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
-		echo $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
 		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
