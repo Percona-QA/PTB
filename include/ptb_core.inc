@@ -431,7 +431,7 @@ function ptb_create_defaults_file()
 	echo "port=${S_PORT[$instanceid]}" >> $file
 	echo "socket=${S_SOCKET[$instanceid]}" >> $file
 	echo "pid-file=${S_PIDFILE[$instanceid]}" >> $file
-	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 	# Fix for https://github.com/Percona-QA/PTB/issues/27
 	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
 	# Fix for https://github.com/Percona-QA/PTB/issues/26
@@ -449,7 +449,7 @@ function ptb_create_defaults_file()
 	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
-	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 	# GTID	
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
@@ -510,7 +510,7 @@ function ptb_init_server_instance()
 		S_DEFAULTSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/my.cnf"
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
-		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
 		# Change here to use different innodb_page_size, default is 16k		
 		S_INNODB_PAGE_SIZE[$instanceid]="64k"
@@ -527,7 +527,7 @@ function ptb_init_server_instance()
 		S_SSL_CERT_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-cert.pem"
 		S_SSL_KEY_CLIENT[$instanceid]="${S_BASEDIR[$instanceid]}/newcerts/client-key.pem"
 		
-		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then		
 		# GTID
 		S_MASTER_INFO_REPOSITORY[$instanceid]="table"
 		S_RELAY_LOG_INFO_REPOSITORY[$instanceid]="table"
@@ -718,7 +718,7 @@ function ptb_create_server_data()
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
-		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysqld --defaults-file=${S_DEFAULTSFILE[$instanceid]} --initialize-insecure --basedir=${S_BINDIR[$instanceid]}
 			# Generating RSA keys inside datadir
 			ptb_creatersa "${S_DATADIR[$instanceid]}"

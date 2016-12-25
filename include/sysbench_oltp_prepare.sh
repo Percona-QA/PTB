@@ -81,7 +81,7 @@ function prepare()
 	# (Also see xtrabackup_incremental_backup.sh)
 	# UPDATE: 21 november 2016 -> https://github.com/Percona-QA/PTB/issues/31 -> Updating jenkins user to be created using sha256_password plugin
 	# UPDATE: 24 november 2016 -> https://github.com/Percona-QA/PTB/issues/45 -> Add check for server version
-	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then		
+	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ] || [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then		
 		
 		ptb_sql $PTB_OPT_server_id "CREATE user 'jenkins'@'localhost' IDENTIFIED WITH sha256_password"
 		rc=$?
@@ -180,7 +180,7 @@ function prepare()
 	# Date: 13 november 2016
 	# Adding general tablespaces and transparent column compression support(zlib or lz4). Only for 5.7 version. 
 	
-	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]; then
+	if [ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
 			# Creating general tablespace			
 			ptb_sql $PTB_OPT_server_id "create tablespace ts1 add datafile 'ts1.ibd' engine=innodb"
 			rc=$?
@@ -223,15 +223,15 @@ function prepare()
 			fi
 			
 			# Altering to use transparent compression -> 'lz4' or 'zlib'
-#			for i in 1 2 3 4 5
-#			do		
-#				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
-#			done
-#			rc=$?
-#			if [ $rc -ne 0 ]; then
-#				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
-#				ptb_cleanup 0
-#				return $rc
+			for i in 1 2 3 4 5
+			do		
+				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i compression='lz4'"
+			done
+			rc=$?
+			if [ $rc -ne 0 ]; then
+				ptb_report_error "$rpt_prefix - ptb_sql failed with $rc."
+				ptb_cleanup 0
+				return $rc
 #			fi
 	
 			# Running optimize table, because it is a requirement.
