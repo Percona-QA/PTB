@@ -511,6 +511,7 @@ function ptb_init_server_instance()
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
 		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
+		echo $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
 		# Change here to use different innodb_page_size, default is 16k		
 		S_INNODB_PAGE_SIZE[$instanceid]="64k"
