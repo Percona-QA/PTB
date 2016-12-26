@@ -253,7 +253,8 @@ function prepare()
 			# Fix for https://github.com/Percona-QA/PTB/issues/26
 			# Date: 15 november 2016
 			# Altering tables to use tablespace encryption
-			
+			# Exclude MariaDB for this, because there is no such thing there.
+			if [[ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]]; then
 			for i in 1 2 3 4 5
 			do		
 				ptb_sql $PTB_OPT_server_id "alter table sbtest.sbtest$i encryption='Y'"
@@ -264,6 +265,7 @@ function prepare()
 				ptb_cleanup 0
 				return $rc
 			fi
+			fi			
 
 			# Fix for https://github.com/Percona-QA/PTB/issues/32
 			# and Fix for https://github.com/Percona-QA/PTB/issues/33

@@ -434,10 +434,14 @@ function ptb_create_defaults_file()
 	if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]]; then
 	# Fix for https://github.com/Percona-QA/PTB/issues/27
 	echo "innodb_page_size=${S_INNODB_PAGE_SIZE[$instanceid]}" >> $file
+	fi
+	
+	if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]]; then	
 	# Fix for https://github.com/Percona-QA/PTB/issues/26
 	echo "early_plugin_load=${S_EARLY_PLUGIN_LOAD[$instanceid]}" >> $file
 	echo "keyring_file_data=${S_KEYRING_FILE_DATA[$instanceid]}" >> $file
 	fi
+	
 	echo "console" >> $file
 	
 	#changed for Jenkins job
@@ -514,6 +518,9 @@ function ptb_init_server_instance()
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
 		# Change here to use different innodb_page_size, default is 16k		
 		S_INNODB_PAGE_SIZE[$instanceid]="64k"
+		fi
+
+		if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]]; then
 		# Fix for https://github.com/Percona-QA/PTB/issues/26
 		S_EARLY_PLUGIN_LOAD[$instanceid]="keyring_file.so"
 		# Fix for https://github.com/Percona-QA/PTB/issues/42 -> keep keyring file outside datadir
@@ -718,7 +725,7 @@ function ptb_create_server_data()
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
-		if [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ] || [ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]; then
+		if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]]; then
 			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysqld --defaults-file=${S_DEFAULTSFILE[$instanceid]} --initialize-insecure --basedir=${S_BINDIR[$instanceid]}
 			# Generating RSA keys inside datadir
 			ptb_creatersa "${S_DATADIR[$instanceid]}"
