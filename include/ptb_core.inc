@@ -449,7 +449,7 @@ function ptb_create_defaults_file()
 	
 	echo "server-id=$instanceid" >> $file
 	echo "general-log-file=${S_QUERYLOGFILE[$instanceid]}" >> $file
-	if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]];
+	if [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.6" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]] || [[ $(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1) == "10.1" ]]; then
 	# GTID	
 	echo "master-info-repository=${S_MASTER_INFO_REPOSITORY[$instanceid]}" >> $file
 	echo "relay-log-info-repository=${S_RELAY_LOG_INFO_REPOSITORY[$instanceid]}" >> $file
