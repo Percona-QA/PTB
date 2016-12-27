@@ -118,12 +118,16 @@ function backup()
 
 	local backup_command="--defaults-file=${S_DEFAULTSFILE[$PTB_OPT_server_id]} --no-version-check"
 	local backup_ssl="--ssl=1 --ssl-ca=${S_SSL_CA_CLIENT[$PTB_OPT_server_id]} --ssl-cert=${S_SSL_CERT_CLIENT[$PTB_OPT_server_id]} --ssl-key=${S_SSL_KEY_CLIENT[$PTB_OPT_server_id]}"
-	local backup_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
+	
 	backup_command="$backup_command --no-timestamp"
 	backup_command="$backup_command --tmpdir=$PTB_OPT_vardir"
 	backup_command="$backup_command $xb_backup_command_options"
 	backup_command="$backup_command $backup_ssl"
+	if [[ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]]; then
+	local backup_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 	backup_command="$backup_command $backup_keyring_plugin"
+	fi
+	
 
 	ptb_report_info "$rpt_prefix - Beginning backup test with basic options ${backup_command}"
 

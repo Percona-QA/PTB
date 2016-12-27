@@ -67,9 +67,11 @@ function restore()
 	fi
 
 	local restore_base_command="--defaults-file=${S_DEFAULTSFILE[${PTB_OPT_server_id}]} --no-version-check"
-	local restore_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"
 	restore_base_command="$restore_base_command $xb_restore_command_options"
+	if [[ $(${S_BINDIR[$PTB_OPT_server_id]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1) == "5.7" ]]; then
+	local restore_keyring_plugin="--keyring-file-data=${S_KEYRING_FILE_DATA[$PTB_OPT_server_id]}"	
 	restore_base_command="$restore_base_command $restore_keyring_plugin"
+	fi
 
 	# loop through full backups
 	local full_cycle=0
