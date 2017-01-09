@@ -409,8 +409,11 @@ S_INNODB_UNDO_LOGS[0]=
 #
 # $1 - required, server instance id.
 
-MYSQLD_VERSION=$(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
-MARIAD_VERSION=$(${S_BINDIR[$instanceid]}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
+MYSQLD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
+MARIAD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
+
+echo ${MYSQLD_VERSION}
+echo ${MARIAD_VERSION}
 
 function ptb_create_defaults_file()
 {
