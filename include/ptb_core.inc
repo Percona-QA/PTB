@@ -743,7 +743,7 @@ function ptb_create_server_data()
 		ptb_report_error "ptb_create_server_data($1) - Can not create server data for $instanceid with the server still running as PID `cat ${S_PIDFILE[$instanceid]}` on port ${S_PORT[$instanceid]} and ${S_SOCKET[$instanceid]}."
 		rc=$PTB_RET_SERVER_RUNNING
 	else
-		local MYSQLD_VERSION=$(ptb_check_mysqld_version)
+		local MYSQLD_VERSION=$(ptb_check_mysqld_version ${S_BASEDIR[$instanceid]})
 
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
