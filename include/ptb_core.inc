@@ -409,17 +409,27 @@ S_INNODB_UNDO_LOGS[0]=
 #
 # $1 - required, server instance id.
 
-MYSQLD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
-MARIAD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
+function ptb_check_mysqld_version()
+{
+	local MYSQLD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
+	echo "$MYSQLD_VERSION"
+}
 
-echo ${MYSQLD_VERSION}
-echo ${MARIAD_VERSION}
+
+function ptb_check_mariadb_version()
+{
+	local MARIAD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
+	echo "$MARIAD_VERSION"
+}
 
 function ptb_create_defaults_file()
 {
 	ptb_report_idebug_enter "ptb_create_defaults_file($1)"
 	local instanceid=$1
 	local file=${S_DEFAULTSFILE[$instanceid]}
+	
+	local MYSQLD_VERSION=$(ptb_check_mysqld_version)
+	local MARIAD_VERSION=$(ptb_check_mariadb_version)
 	
 	echo "[client]" > $file
 	echo "port=${S_PORT[$instanceid]}" >> $file
@@ -506,6 +516,8 @@ function ptb_init_server_instance()
 		ptb_report_error "ptb_init_server_instance($1, $2, $3) - Invalid server binary root directory specified, directory not found."
 		rc=$PTB_RET_INVALID_BINDIR
 	else
+		local MYSQLD_VERSION=$(ptb_check_mysqld_version)
+		local MARIAD_VERSION=$(ptb_check_mariadb_version)		
 		ptb_report_info "ptb_init_server_instance($1, $2, $3) - Initializing server instance."
 		S_BINDIR[$instanceid]="$bindir"
 		S_BASEDIR[$instanceid]="${PTB_DATADIR}/mysql.${instanceid}"
@@ -729,6 +741,8 @@ function ptb_create_server_data()
 		ptb_report_error "ptb_create_server_data($1) - Can not create server data for $instanceid with the server still running as PID `cat ${S_PIDFILE[$instanceid]}` on port ${S_PORT[$instanceid]} and ${S_SOCKET[$instanceid]}."
 		rc=$PTB_RET_SERVER_RUNNING
 	else
+		local MYSQLD_VERSION=$(ptb_check_mysqld_version)
+
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
