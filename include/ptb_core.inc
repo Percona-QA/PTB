@@ -411,14 +411,14 @@ S_INNODB_UNDO_LOGS[0]=
 
 function ptb_check_mysqld_version()
 {
-	local MYSQLD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
+	local MYSQLD_VERSION=$($1/bin/mysqld --version | grep -oe '5\.[567]' | head -n1)
 	echo "$MYSQLD_VERSION"
 }
 
 
 function ptb_check_mariadb_version()
 {
-	local MARIAD_VERSION=$(${bindir}/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
+	local MARIAD_VERSION=$($1/bin/mysqld --version | grep -oe '10\.[1]' | head -n1)
 	echo "$MARIAD_VERSION"
 }
 
@@ -428,8 +428,8 @@ function ptb_create_defaults_file()
 	local instanceid=$1
 	local file=${S_DEFAULTSFILE[$instanceid]}
 	
-	local MYSQLD_VERSION=$(ptb_check_mysqld_version)
-	local MARIAD_VERSION=$(ptb_check_mariadb_version)
+	local MYSQLD_VERSION=$(ptb_check_mysqld_version ${S_BINDIR[$instanceid]})
+	local MARIAD_VERSION=$(ptb_check_mariadb_version ${S_BINDIR[$instanceid]})
 	
 	echo "[client]" > $file
 	echo "port=${S_PORT[$instanceid]}" >> $file
@@ -516,8 +516,7 @@ function ptb_init_server_instance()
 		ptb_report_error "ptb_init_server_instance($1, $2, $3) - Invalid server binary root directory specified, directory not found."
 		rc=$PTB_RET_INVALID_BINDIR
 	else
-		local MYSQLD_VERSION=$(ptb_check_mysqld_version)
-		local MARIAD_VERSION=$(ptb_check_mariadb_version)		
+				
 		ptb_report_info "ptb_init_server_instance($1, $2, $3) - Initializing server instance."
 		S_BINDIR[$instanceid]="$bindir"
 		S_BASEDIR[$instanceid]="${PTB_DATADIR}/mysql.${instanceid}"
@@ -533,6 +532,9 @@ function ptb_init_server_instance()
 		S_DEFAULTSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/my.cnf"
 		S_OPTIONSFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.opts"
 		S_IDFILE[$instanceid]="${S_BASEDIR[$instanceid]}/.ptb.id"
+		local MYSQLD_VERSION=$(ptb_check_mysqld_version ${S_BINDIR[$instanceid]})
+		local MARIAD_VERSION=$(ptb_check_mariadb_version ${S_BINDIR[$instanceid]})
+
 		if [[ ${MYSQLD_VERSION} == "5.7" ]] || [[ ${MARIAD_VERSION} == "10.1" ]]; then
 		# Fix for https://github.com/Percona-QA/PTB/issues/27
 		# Change here to use different innodb_page_size, default is 16k		
@@ -746,6 +748,7 @@ function ptb_create_server_data()
 		ptb_report_info "ptb_create_server_data($1) - Creating server data in ${S_DATADIR[$instanceid]}."
 		ptb_runcmd rm -rf ${S_DATADIR[$instanceid]}
 		ptb_runcmd mkdir ${S_DATADIR[$instanceid]}
+		local MYSQLD_VERSION=$(ptb_check_mysqld_version ${S_BINDIR[$instanceid]})
 		if [[ ${MYSQLD_VERSION} == "5.7" ]]; then
 			ptb_runcmdpathlog ${S_BINDIR[$instanceid]}/scripts:${S_BINDIR[$instanceid]}/bin ${S_BASEDIR[$instanceid]}/installdb.log mysqld --defaults-file=${S_DEFAULTSFILE[$instanceid]} --initialize-insecure --basedir=${S_BINDIR[$instanceid]}
 			# Generating RSA keys inside datadir
