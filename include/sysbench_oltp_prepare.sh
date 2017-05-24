@@ -50,7 +50,14 @@ function prepare()
 	ptb_init $PTB_OPT_vardir $PTB_OPT_verbosity "$PTB_OPT_prepare_logfile"
 
 	local rc=1
-	local sysbench_test="${PTB_OPT_prepare_rootdir}/tests/db/parallel_prepare.lua" 
+	# START
+	# This is fix for : https://github.com/Percona-QA/PTB/issues/57
+	# Date: 24 may 2017
+	# Reason: From sysbench 1.0 there is no need to specify path for test, as well as --num-threads etc. options also deprecated.
+	# Options are going to be changed also in examples/.cfg files
+	local sysbench_test="oltp_read_write"
+	#local sysbench_test="${PTB_OPT_prepare_rootdir}/tests/db/parallel_prepare.lua" 
+	# END
 	if [ ! -r "$sysbench_test" ]; then
 		ptb_report_error "$rpt_prefix - can not access sysbench test $sysbench_test" 
 		rc=$PTB_RET_INVALID_ARGUMENT
@@ -122,15 +129,20 @@ function prepare()
 	fi
 	# END
 	############################################################################################
-	
-
-	local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
-
+	############################################################################################
+	# START
+	# This is fix for : https://github.com/Percona-QA/PTB/issues/57
+	# Date: 24 may 2017
+	# Reason: From sysbench 1.0 there is no need to specify path for test as well as --num-threads option also deprecated.
+	# Options are going to be changed also in examples/.cfg files
+	#local sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
+	local sysbench_cmd="sysbench $sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
 	local i
 	for i in ${PTB_OPT_prepare_option[@]}; do
 		sysbench_cmd="${sysbench_cmd} $i"
 	done
-	sysbench_cmd="${sysbench_cmd} run"
+	#sysbench_cmd="${sysbench_cmd} run"
+	sysbench_cmd="${sysbench_cmd} prepare"
 
 	if [ -n "$PTB_OPT_prepare_logfile" ]; then
 		echo "Running: $sysbench_cmd" >> $PTB_OPT_prepare_logfile
