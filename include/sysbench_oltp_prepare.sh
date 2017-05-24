@@ -55,7 +55,7 @@ function prepare()
 	# Date: 24 may 2017
 	# Reason: From sysbench 1.0 there is no need to specify path for test, as well as --num-threads etc. options also deprecated.
 	# Options are going to be changed also in examples/.cfg files
-	local sysbench_test="${PTB_OPT_prepare_rootdir}/oltp_read_write"
+	local sysbench_test="${PTB_OPT_prepare_rootdir}/oltp_read_write.lua"
 	echo $sysbench_test
 	#local sysbench_test="${PTB_OPT_prepare_rootdir}/tests/db/parallel_prepare.lua" 
 	# END
