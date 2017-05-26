@@ -56,7 +56,7 @@ function load()
 		ptb_cleanup 0
 		return $rc
 	fi
-	sysbench_cmd="sysbench --test=$sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
+	sysbench_cmd="sysbench $sysbench_test --mysql-socket=${S_SOCKET[$PTB_OPT_server_id]} --mysql-user=root"
 	local i
 	for i in ${PTB_OPT_load_option[@]}; do
 		sysbench_cmd="${sysbench_cmd} $i"
