@@ -49,7 +49,7 @@ function load()
 	ptb_init $PTB_OPT_vardir $PTB_OPT_verbosity "$PTB_OPT_load_logfile"
 
 	local rc=1
-	sysbench_test="${PTB_OPT_load_rootdir}/tests/db/oltp.lua" 
+	sysbench_test="${PTB_OPT_load_rootdir}/oltp_read_write.lua" 
 	if [ ! -r "$sysbench_test" ]; then
 		ptb_report_error "sysbench_oltp_load.sh - can not access sysbench test $sysbench_test"
 		rc=$PTB_RET_INVALID_ARGUMENT
